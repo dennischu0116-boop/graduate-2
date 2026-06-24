@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中山化學 畢業與修課系統</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // 模擬從 'react' 解構常用的 Hook
+        const { useState, useMemo, useEffect } = React;
+
+        // 模擬 lucide-react 圖標 (建立簡單的 SVG 圖標元件)
+        const LucideIcon = ({ name, className = "w-5 h-5", ...props }) => {
+            const icons = {
+                CheckCircle2: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>,
+                Circle: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><circle cx="12" cy="12" r="10"/></svg>,
+                AlertCircle: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>,
+                BookOpen: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
+                GraduationCap: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M6 18.8V13.5"/><path d="M12 22v-6.3"/></svg>,
+                Check: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><polyline points="20 6 9 17 4 12"/></svg>,
+                Calculator: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>,
+                Info: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>,
+                Languages: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>,
+                Globe: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+                Activity: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+                Search: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>,
+                X: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>,
+                ChevronDown: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><polyline points="6 9 12 15 18 9"/></svg>,
+                ChevronUp: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><polyline points="18 15 12 9 6 15"/></svg>,
+                ExternalLink: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>,
+                CalendarDays: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>,
+                LayoutDashboard: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>,
+                Plus: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="12" y1="12" y2="12"/></svg>,
+                Trash2: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>,
+                Download: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>,
+                Upload: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>,
+                Copy: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>,
+                Award: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>,
+                Pencil: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>,
+                GripVertical: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class={className} {...props}><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+            };
+            return icons[name] || null;
+        };
+
+        // --- 資料定義 ---
+        const CURRICULUM = {
+          generalRequired: [
+            { id: 'gr_chem', name: '普通化學', credits: 4, semester: '一上', type: '必修' },
+            { id: 'gr_phy1', name: '普通物理(一)', credits: 3, semester: '一上', type: '必修' },
+            { id: 'gr_phy2', name: '普通物理(二)', credits: 3, semester: '一下', type: '必修' },
+            { id: 'gr_cal1', name: '微積分(一)', credits: 3, semester: '一上', type: '必修' },
+            { id: 'gr_cal2', name: '微積分(二)', credits: 3, semester: '一下', type: '必修' },
+            { id: 'gr_seminar', name: '書報討論', credits: 1, semester: '三下', type: '必修' },
+          ],
+          professionalRequired: [
+            { id: 'pr_org1', name: '有機化學(一)', credits: 3, semester: '一下', type: '必修' },
+            { id: 'pr_org2', name: '有機化學(二)', credits: 3, semester: '二上', type: '必修' },
+            { id: 'pr_ana1', name: '分析化學(一)', credits: 3, semester: '一下', type: '必修' },
+            { id: 'pr_ana2', name: '分析化學(二)', credits: 3, semester: '二上', type: '必修' },
+            { id: 'pr_inorg1', name: '無機化學(一)', credits: 3, semester: '二下', type: '必修' },
+            { id: 'pr_inorg2', name: '無機化學(二)', credits: 3, semester: '三上', type: '必修' },
+            { id: 'pr_phy1', name: '物理化學(一)', credits: 3, semester: '二下', type: '必修' },
+            { id: 'pr_phy2', name: '物理化學(二)', credits: 3, semester: '三上', type: '必修' },
+            { id: 'pr_lab1', name: '化學實驗(一)', credits: 2, semester: '一上', type: '必修' },
+            { id: 'pr_lab2', name: '化學實驗(二)', credits: 2, semester: '一下', type: '必修' },
+            { id: 'pr_lab3', name: '化學實驗(三)', credits: 2, semester: '二上', type: '必修' },
+            { id: 'pr_lab4', name: '化學實驗(四)', credits: 2, semester: '二下', type: '必修' },
+            { id: 'pr_lab5', name: '化學實驗(五)', credits: 2, semester: '三上', type: '必修' },
+          ],
+          themeCourses: [
+            { id: 'tc_1', name: '有機化學反應', credits: 3, type: '主題' }, 
+            { id: 'tc_2', name: '有機光譜概論', credits: 3, type: '主題' },
+            { id: 'tc_3', name: '有機合成', credits: 3, type: '主題' }, 
+            { id: 'tc_4', name: '材料化學導論', credits: 3, type: '主題' },
+            { id: 'tc_5', name: '生物化學(一)', credits: 3, type: '主題' }, 
+            { id: 'tc_6', name: '生物化學(二)', credits: 3, type: '主題' },
+            { id: 'tc_7', name: '有機合成實驗', credits: 3, type: '主題' }, 
+            
+            // --- 強烈推薦主題選修 ---
+            { id: 'tc_11', name: '化學數學', credits: 3, semester: '二上', tag: '推薦主題選修', type: '主題' },
+            { id: 'tc_9', name: '群論', credits: 3, semester: '二下', tag: '推薦主題選修', type: '主題' },
+            { id: 'tc_8', name: '有機化學(三)', credits: 3, semester: '二下', tag: '推薦主題選修', type: '主題' },
+            { id: 'tc_35', name: '分析化學(三)', credits: 3, semester: '二下', tag: '推薦主題選修', type: '主題' },
+            { id: 'tc_26', name: '無機化學(三)', credits: 3, semester: '三下', tag: '推薦主題選修', type: '主題' },
+            { id: 'tc_18', name: '物理化學(三)', credits: 3, semester: '三下', tag: '推薦主題選修', type: '主題' },
+            // ------------------------
+
+            { id: 'tc_10', name: '奈米薄層結構分析', credits: 3, type: '主題' },
+            { id: 'tc_12', name: '初等分子光譜', credits: 3, type: '主題' },
+            { id: 'tc_13', name: '核磁共振光譜與影像導論', credits: 3, type: '主題' }, 
+            { id: 'tc_14', name: '氣膠科學導論', credits: 3, type: '主題' },
+            { id: 'tc_15', name: 'PM2.5氣膠生醫科學', credits: 3, type: '主題' }, 
+            { id: 'tc_16', name: '化學實驗之程式應用', credits: 3, type: '主題' },
+            { id: 'tc_17', name: '光學顯微術導論', credits: 3, type: '主題' }, 
+            { id: 'tc_19', name: '奈米科技概論', credits: 3, type: '主題' }, 
+            { id: 'tc_20', name: '金屬簇與超分子配位化學', credits: 3, type: '主題' },
+            { id: 'tc_21', name: '生物無機化學', credits: 3, type: '主題' }, 
+            { id: 'tc_22', name: '材料化學', credits: 3, type: '主題' },
+            { id: 'tc_23', name: '有機金屬化學', credits: 3, type: '主題' }, 
+            { id: 'tc_24', name: '高分子化學導論', credits: 3, type: '主題' },
+            { id: 'tc_25', name: '奈米材料之合成鑑定與應用', credits: 3, type: '主題' }, 
+            { id: 'tc_27', name: '化學與再生能源及永續催化', credits: 3, type: '主題' }, 
+            { id: 'tc_28', name: '原子光譜分析技術', credits: 3, type: '主題' },
+            { id: 'tc_29', name: '工業質譜分析應用', credits: 3, type: '主題' }, 
+            { id: 'tc_30', name: '奈米生醫分析', credits: 3, type: '主題' },
+            { id: 'tc_31', name: '質譜分析導論', credits: 3, type: '主題' }, 
+            { id: 'tc_32', name: '化學及生物感測器', credits: 3, type: '主題' },
+            { id: 'tc_33', name: '生物分析導論', credits: 3, type: '主題' }, 
+            { id: 'tc_34', name: '生醫技術導論', credits: 3, type: '主題' },
+            { id: 'tc_36', name: '專題研究(一)(二)', credits: 3, type: '主題' },
+          ],
+          peCourses: [
+            { id: 'pe_fit', name: '體適能', credits: 1, semester: '一上', type: '體育' },
+            { id: 'pe_swim', name: '初級游泳', credits: 1, semester: '一下', type: '體育' }
+          ],
+          genEdCourses: [
+            { id: 'ge_chinese', name: '中文思辨與表達', credits: 3, type: '通識必修' },
+            { id: 'ge_eng_basic', name: '通識英文初級', credits: 0, type: '通識必修' },
+            { id: 'ge_eng_core', name: '通識英文 (依分級)', credits: 3, type: '通識必修' }
+          ],
+          thresholds: [
+            { id: 'ge_service', name: '服務學習', credits: 1, type: '門檻' },
+            { id: 'zc_uni_way', name: '大學之道 (6場)', credits: 0, type: '門檻' },
+            { id: 'zc_eng_cert', name: '英文門檻審核通過', credits: 0, type: '門檻' },
+            { id: 'zc_intl', name: '國際學習 (出國交換/研修)', credits: 0, type: '門檻' },
+            { id: 'zc_cross', name: '跨域學習 (輔系/雙主修/學程)', credits: 0, type: '門檻' }
+          ]
+        };
+
+        const ALL_COURSES = [
+          ...CURRICULUM.generalRequired, 
+          ...CURRICULUM.professionalRequired, 
+          ...CURRICULUM.themeCourses, 
+          ...CURRICULUM.peCourses,
+          ...CURRICULUM.genEdCourses,
+          ...CURRICULUM.thresholds
+        ];
+        const SEMESTERS = ['一上', '一下', '二上', '二下', '三上', '三下', '四上', '四下'];
+
+        // 卡片元件
+        const CourseItem = ({ item, checked, onChange, isAutoChecked }) => (
+          <div 
+            onClick={() => { if (!isAutoChecked) onChange(item.id); }}
+            className={`flex items-start p-3 mb-2 rounded-lg border transition-all duration-200 gap-3 ${
+              checked 
+                ? (isAutoChecked ? 'bg-indigo-50 border-indigo-200 shadow-sm' : 'bg-blue-50 border-blue-200 shadow-sm') 
+                : 'bg-white border-gray-100 hover:border-gray-200 hover:shadow-md'
+            } ${isAutoChecked ? 'cursor-default opacity-95' : 'cursor-pointer'}`}
+          >
+            <div className="flex-shrink-0 mt-0.5">
+              {checked ? (
+                <LucideIcon name="CheckCircle2" className={`w-5 h-5 ${isAutoChecked ? 'text-indigo-500' : 'text-blue-600'}`} />
+              ) : (
+                <LucideIcon name="Circle" className="w-5 h-5 text-gray-300" />
+              )}
+            </div>
+            
+            <div className="flex-1 min-w-0 flex flex-col justify-center">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className={`font-medium truncate ${checked ? (isAutoChecked ? 'text-indigo-900' : 'text-blue-900') : 'text-gray-800'}`} title={item.name}>
+                  {item.name}
+                </p>
+                {item.tag && <span className="text-[10px] bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded-md font-bold whitespace-nowrap">{item.tag}</span>}
+                {isAutoChecked && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md font-bold flex items-center gap-1 whitespace-nowrap"><LucideIcon name="CalendarDays" className="w-3 h-3"/>已排入</span>}
+              </div>
+              {(item.semester || item.note) && (
+                <p className="text-xs text-gray-500 mt-0.5 truncate" title={`${item.semester ? `[${item.semester}] ` : ''}${item.note || ''}`}>
+                  {item.semester && <span className="mr-2">[{item.semester}]</span>}
+                  {item.note && <span>{item.note}</span>}
+                </p>
+              )}
+            </div>
+
+            <div className={`font-semibold whitespace-nowrap flex-shrink-0 ${checked ? (isAutoChecked ? 'text-indigo-600' : 'text-blue-700') : 'text-gray-400'}`}>
+              {item.credits} 學分
+            </div>
+          </div>
+        );
+
+        // 主 App 元件
+        function App() {
+          const [currentView, setCurrentView] = useState('checker'); // 'checker' | 'planner'
+          const [isLinked, setIsLinked] = useState(true);
+
+          // ================= 檢核表 State =================
+          const [manualCheckedItems, setManualCheckedItems] = useState({}); 
+          const [freeElectives, setFreeElectives] = useState(''); 
+          const [showUnmetModal, setShowUnmetModal] = useState(false);
+          const [engLevel, setEngLevel] = useState('中級'); 
+          const [crossCredits, setCrossCredits] = useState(''); 
+          const [liberalCredits, setLiberalCredits] = useState({ dim1: '', dim2: '', dim3: '', dim4: '', dim5: '', dim6: '' }); 
+
+          // ================= 規劃表 State =================
+          const [plannedCourses, setPlannedCourses] = useState(() => {
+            const initialPlan = { '一上': [], '一下': [], '二上': [], '二下': [], '三上': [], '三下': [], '四上': [], '四下': [] };
+            ALL_COURSES.forEach(course => {
+              if (course.semester && initialPlan[course.semester]) {
+                initialPlan[course.semester].push(course);
+              }
+            });
+            return initialPlan;
+          });
+          const [plannerModalOpen, setPlannerModalOpen] = useState(false);
+          const [activeSemester, setActiveSemester] = useState('一上');
+          const [customCourseName, setCustomCourseName] = useState('');
+          const [customCourseCredits, setCustomCourseCredits] = useState(3);
+          const [customCourseType, setCustomCourseType] = useState('free');
+          const [plannerTab, setPlannerTab] = useState('catalog'); 
+          const [editingCourseId, setEditingCourseId] = useState(null);
+
+          // ================= 拖曳排課 State =================
+          const [dragOverSemester, setDragOverSemester] = useState(null);
+
+          // ================= 導入導出 State =================
+          const [showDataModal, setShowDataModal] = useState(false);
+          const [dataModalMode, setDataModalMode] = useState('import');
+          const [dataCode, setDataCode] = useState('');
+          const [dataError, setDataError] = useState('');
+          const [copySuccess, setCopySuccess] = useState(false);
+
+          // --- 計算連動狀態 ---
+          const plannedIds = useMemo(() => {
+            const ids = new Set();
+            Object.keys(plannedCourses).forEach(key => {
+              plannedCourses[key].forEach(c => {
+                if (!c.isCustom) ids.add(c.id);
+              });
+            });
+            return ids;
+          }, [plannedCourses]);
+
+          const checkedItems = useMemo(() => {
+            if (!isLinked) return manualCheckedItems;
+            const merged = { ...manualCheckedItems };
+            plannedIds.forEach(id => { merged[id] = true; });
+            return merged;
+          }, [manualCheckedItems, plannedIds, isLinked]);
+
+          const totalPlannedCredits = useMemo(() => {
+            let sum = 0;
+            Object.keys(plannedCourses).forEach(key => {
+              plannedCourses[key].forEach(c => { sum += c.credits; });
+            });
+            return sum;
+          }, [plannedCourses]);
+
+          const availableCatalog = useMemo(() => {
+            const plannedSet = new Set(plannedIds);
+            return ALL_COURSES.filter(c => {
+              if (plannedSet.has(c.id)) return false;
+              if (c.type === '體育') return false; 
+              if (engLevel === '高級' || checkedItems['eng_waiver']) {
+                if (c.id === 'ge_eng_basic' || c.id === 'ge_eng_core') return false;
+              } else if (engLevel !== '初級' && c.id === 'ge_eng_basic') {
+                return false;
+              }
+              return true;
+            });
+          }, [plannedIds, engLevel, checkedItems]);
+
+          // --- 雙向連動與檢核功能 ---
+          const toggleItem = (id) => {
+            if (isLinked && plannedIds.has(id)) {
+              setPlannedCourses(prev => {
+                const newPlan = { ...prev };
+                Object.keys(newPlan).forEach(sem => {
+                  newPlan[sem] = newPlan[sem].filter(c => c.id !== id);
+                });
+                return newPlan;
+              });
+              setManualCheckedItems(prev => ({ ...prev, [id]: false }));
+              
+              if (id === 'zc_uni_way') {
+                 setManualCheckedItems(prev => {
+                    const next = {...prev};
+                    for(let i=1; i<=6; i++) next[`zc_uni_way_${i}`] = false;
+                    return next;
+                 });
+              }
+              return;
+            }
+            setManualCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
+          };
+
+          const handleLiberalChange = (dim, value) => {
+            const val = value === '' ? '' : Math.max(0, parseInt(value) || 0);
+            setLiberalCredits(prev => ({ ...prev, [dim]: val }));
+          };
+
+          const calcCredits = (category) => CURRICULUM[category].reduce((sum, item) => sum + (checkedItems[item.id] ? item.credits : 0), 0);
+
+          // 核心邏輯運算
+          const stats = useMemo(() => {
+            let plannerCross = 0;
+            let plannerCrossEng = false;
+            let plannerDims = { dim1: 0, dim2: 0, dim3: 0, dim4: 0, dim5: 0, dim6: 0 };
+            let plannerFree = 0;
+            let plannerPe = 0;
+
+            if (isLinked) {
+              Object.keys(plannedCourses).forEach(key => {
+                plannedCourses[key].forEach(c => {
+                  if (c.isCustom) {
+                    if (c.customType === 'cross') plannerCross += c.credits;
+                    else if (c.customType === 'cross_eng') {
+                      plannerCross += c.credits;
+                      plannerCrossEng = true;
+                    }
+                    else if (c.customType && c.customType.startsWith('dim')) {
+                      plannerDims[c.customType] += c.credits;
+                    }
+                    else if (c.customType === 'pe') {
+                      plannerPe += c.credits;
+                    }
+                    else {
+                      plannerFree += c.credits;
+                    }
+                  }
+                });
+              });
+            }
+
+            const hasEngWaiver = engLevel === '高級' || checkedItems['eng_waiver'];
+            const engCoreCredits = hasEngWaiver || checkedItems['ge_eng_core'] ? 3 : 0;
+            const langCredits = (checkedItems['ge_chinese'] ? 3 : 0) + engCoreCredits;
+            let isEngMet = false;
+            if (hasEngWaiver) isEngMet = true;
+            else if (engLevel === '初級') isEngMet = checkedItems['ge_eng_basic'] && checkedItems['ge_eng_core'];
+            else isEngMet = !!checkedItems['ge_eng_core'];
+            const isLangMet = !!checkedItems['ge_chinese'] && isEngMet;
+
+            const eapLevel = (engLevel === '初級' || engLevel === '中級') ? '中高級' : '高級';
+            
+            const effectiveCross = Math.max(0, (parseInt(crossCredits) || 0) + (isLinked ? plannerCross : 0));
+            const parsedCross = Math.min(effectiveCross, 8); 
+            const crossSpillover = Math.max(0, effectiveCross - 8); 
+            const effectiveCrossEng = checkedItems['ge_cross_eng'] || (isLinked && plannerCrossEng);
+            const isCrossMet = parsedCross >= 8 && effectiveCrossEng;
+
+            const effDims = {
+              dim1: Math.max(0, (parseInt(liberalCredits.dim1) || 0) + (isLinked ? plannerDims.dim1 : 0)),
+              dim2: Math.max(0, (parseInt(liberalCredits.dim2) || 0) + (isLinked ? plannerDims.dim2 : 0)),
+              dim3: Math.max(0, (parseInt(liberalCredits.dim3) || 0) + (isLinked ? plannerDims.dim3 : 0)),
+              dim4: Math.max(0, (parseInt(liberalCredits.dim4) || 0) + (isLinked ? plannerDims.dim4 : 0)),
+              dim5: Math.max(0, (parseInt(liberalCredits.dim5) || 0) + (isLinked ? plannerDims.dim5 : 0)),
+              dim6: Math.max(0, (parseInt(liberalCredits.dim6) || 0) + (isLinked ? plannerDims.dim6 : 0)),
+            };
+
+            const activeDims = Object.values(effDims).filter(v => v > 0).length;
+            const dim56Sum = effDims.dim5 + effDims.dim6;
+            const validDim56 = Math.min(dim56Sum, 6); 
+            const invalidDim56 = Math.max(0, dim56Sum - 6); 
+            
+            const validLiberalTotal = effDims.dim1 + effDims.dim2 + effDims.dim3 + effDims.dim4 + validDim56;
+            const liberalCountingToReq = Math.min(validLiberalTotal, 13); 
+            const liberalSpilloverTemp = Math.max(0, validLiberalTotal - 13);
+            const validLiberalSpillover = Math.min(liberalSpilloverTemp, 6); 
+            const invalidLiberalExcess = Math.max(0, validLiberalTotal - 19); 
+            const isLiberalMet = validLiberalTotal >= 13 && activeDims >= 4;
+
+            const expCredits = checkedItems['ge_service'] ? 1 : 0;
+            const isExpMet = expCredits === 1;
+
+            const isUniWayPlanned = isLinked && plannedIds.has('zc_uni_way');
+            const manualUniWayCount = [1, 2, 3, 4, 5, 6].filter(i => manualCheckedItems[`zc_uni_way_${i}`]).length;
+            const uniWayCount = isUniWayPlanned ? 6 : manualUniWayCount;
+            const uniWayMet = uniWayCount === 6;
+
+            const genEdTotal = langCredits + parsedCross + liberalCountingToReq + expCredits;
+            const isGenEdCoreMet = isLangMet && isCrossMet && isLiberalMet && isExpMet;
+
+            const effectivePeOther = Math.max(0, (parseInt(manualCheckedItems['pe_other']) || 0) + (isLinked ? plannerPe : 0));
+            const peCredits = (checkedItems['pe_fit'] ? 1 : 0) + (checkedItems['pe_swim'] ? 1 : 0) + effectivePeOther;
+            const isPeMet = checkedItems['pe_fit'] && checkedItems['pe_swim'] && effectivePeOther >= 2;
+
+            const genReqCredits = calcCredits('generalRequired');
+            const profReqCredits = calcCredits('professionalRequired');
+            const themeCredits = calcCredits('themeCourses');
+            
+            const themeCreditsUsedForReq = Math.min(themeCredits, 18);
+            const themeCreditsSpillover = Math.max(0, themeCredits - 18); 
+
+            const effectiveFreeElectives = Math.max(0, (parseInt(freeElectives) || 0) + (isLinked ? plannerFree : 0));
+            const totalFreeElectives = crossSpillover + validLiberalSpillover + themeCreditsSpillover + effectiveFreeElectives;
+            
+            const totalGradCredits = genEdTotal + genReqCredits + profReqCredits + themeCreditsUsedForReq + totalFreeElectives;
+            const isIntlCrossMet = !!checkedItems['zc_intl'] || !!checkedItems['zc_cross'];
+
+            return {
+              plannerCross, plannerCrossEng, plannerDims, plannerFree, plannerPe, effectiveCrossEng, effectiveCross, effDims, effectivePeOther,
+              engCoreCredits, hasEngWaiver, eapLevel, langCredits, isLangMet, isEngMet,
+              parsedCross, crossSpillover, isCrossMet, validLiberalTotal, activeDims, isLiberalMet, invalidDim56, invalidLiberalExcess, validLiberalSpillover,
+              expCredits, isExpMet, uniWayCount, uniWayMet, isUniWayPlanned, genEdTotal, isGenEdCoreMet, peCredits, isPeMet,
+              genReqCredits, isGenReqMet: genReqCredits >= 17,
+              profReqCredits, isProfReqMet: profReqCredits >= 34,
+              themeCredits, themeCreditsUsedForReq, themeCreditsSpillover, isThemeMet: themeCredits >= 18,
+              effectiveFreeElectives, totalFreeElectives, totalGradCredits, isTotalMet: totalGradCredits >= 128,
+              engCertMet: !!checkedItems['zc_eng_cert'], isIntlCrossMet
+            };
+          }, [checkedItems, freeElectives, crossCredits, liberalCredits, engLevel, isLinked, plannedCourses, manualCheckedItems]);
+
+          const getUnmetList = () => {
+            const list = [];
+            if (!stats.isLangMet) {
+              if (!checkedItems['ge_chinese']) list.push(`語文素養：未完成「中文思辨與表達」`);
+              if (!stats.isEngMet) {
+                if (engLevel === '初級' && !stats.hasEngWaiver) list.push(`語文素養：未完成英文規定路徑 (初級 + 中級)`);
+                else list.push(`語文素養：未完成「通識英文」課程或抵免`);
+              }
+            }
+            if (!stats.isCrossMet) list.push(`跨院選修：未達標 (需 8 學分並包含1門「${stats.eapLevel} EAP/ESP」)`);
+            if (!stats.isLiberalMet) list.push(`博雅課程：未達標 (需 13 學分且涵蓋至少 4 個向度)`);
+            if (!stats.isExpMet) list.push(`服務學習：未完成 (需 1 學分)`);
+            if (!stats.engCertMet) list.push(`英語文能力認證：未完成畢業門檻認證`);
+            if (!stats.uniWayMet) list.push(`大學之道：未完成 (目前已完成 ${stats.uniWayCount}/6 場)`);
+            if (!stats.isIntlCrossMet) list.push(`國際或跨域學習：未完成 (需達成「國際學習」或「跨域學習」至少一項)`);
+            if (!stats.isPeMet) list.push(`運動與健康：未達標 (需完成體適能、初級游泳及其他 2 學分)`);
+            if (!stats.isGenReqMet) list.push(`系一般必修：未滿 17 學分 (目前 ${stats.genReqCredits} 學分)`);
+            if (!stats.isProfReqMet) list.push(`系專業必修：未滿 34 學分 (目前 ${stats.profReqCredits} 學分)`);
+            if (!stats.isThemeMet) list.push(`主題課程：未滿 18 學分 (目前 ${stats.themeCreditsUsedForReq} 學分)`);
+            if (!stats.isTotalMet) list.push(`畢業總學分：未滿 128 學分 (目前 ${stats.totalGradCredits} 學分)`);
+            return list;
+          };
+
+          const RuleCheck = ({ label, isMet, hint }) => (
+            <div className="flex items-start gap-2 text-sm mb-2">
+              {isMet ? <LucideIcon name="CheckCircle2" className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" /> : <LucideIcon name="AlertCircle" className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />}
+              <div>
+                <span className={isMet ? 'text-gray-700' : 'text-gray-600 font-medium'}>{label}</span>
+                {hint && <p className="text-xs text-gray-400 mt-0.5">{hint}</p>}
+              </div>
+            </div>
+          );
+
+          const handleExport = () => {
+            const data = {
+              manualCheckedItems, freeElectives, engLevel, crossCredits, liberalCredits, plannedCourses
+            };
+            const jsonStr = JSON.stringify(data);
+            const code = btoa(unescape(encodeURIComponent(jsonStr)));
+            setDataCode(code);
+            setDataModalMode('export');
+            setDataError('');
+            setShowDataModal(true);
+          };
+
+          const handleImport = () => {
+            try {
+              const jsonStr = decodeURIComponent(escape(atob(dataCode)));
+              const data = JSON.parse(jsonStr);
+              
+              if (data.manualCheckedItems) setManualCheckedItems(data.manualCheckedItems);
+              if (data.freeElectives !== undefined) setFreeElectives(data.freeElectives);
+              if (data.engLevel !== undefined) setEngLevel(data.engLevel);
+              if (data.crossCredits !== undefined) setCrossCredits(data.crossCredits);
+              if (data.liberalCredits !== undefined) setLiberalCredits(data.liberalCredits);
+              if (data.plannedCourses !== undefined) setPlannedCourses(data.plannedCourses);
+              
+              setShowDataModal(false);
+            } catch(e) {
+              setDataError('代碼格式錯誤或損毀，請檢查後重新輸入！');
+            }
+          };
+
+          const copyToClipboard = () => {
+            const textArea = document.getElementById("export-textarea");
+            if (textArea) {
+              textArea.focus();
+              textArea.select();
+              textArea.setSelectionRange(0, 999999); 
+              try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                  setCopySuccess(true);
+                  setTimeout(() => setCopySuccess(false), 2500);
+                  setDataError('');
+                } else {
+                  setDataError('平板/瀏覽器阻擋了一鍵複製，請手動長按上方代碼全選複製。');
+                }
+              } catch (err) {
+                setDataError('平板/瀏覽器阻擋了一鍵複製，請手動長按上方代碼全選複製。');
+              }
+            }
+          };
+
+          const handleOpenPlannerModal = (semester) => {
+            setActiveSemester(semester);
+            setPlannerTab('catalog');
+            setCustomCourseName('');
+            setCustomCourseCredits(3);
+            setCustomCourseType('free');
+            setEditingCourseId(null);
+            setPlannerModalOpen(true);
+          };
+
+          const openEditModal = (semester, course) => {
+            setActiveSemester(semester);
+            setEditingCourseId(course.id);
+            setCustomCourseName(course.name);
+            setCustomCourseCredits(course.credits);
+            setCustomCourseType(course.customType || 'free');
+            setPlannerTab('custom');
+            setPlannerModalOpen(true);
+          };
+
+          const saveCustomCourse = () => {
+            if (!customCourseName.trim()) return;
+            
+            if (editingCourseId) {
+              setPlannedCourses(prev => {
+                const newPlan = { ...prev };
+                let oldSemester = null;
+                let oldCourse = null;
+
+                for (const s of SEMESTERS) {
+                  const found = newPlan[s].find(c => c.id === editingCourseId);
+                  if (found) { oldSemester = s; oldCourse = found; break; }
+                }
+
+                if (oldSemester && oldSemester !== activeSemester) {
+                  newPlan[oldSemester] = newPlan[oldSemester].filter(c => c.id !== editingCourseId);
+                  newPlan[activeSemester] = [...newPlan[activeSemester], { ...oldCourse, name: customCourseName, credits: parseInt(customCourseCredits) || 0, customType: customCourseType }];
+                } else if (oldSemester) {
+                  newPlan[oldSemester] = newPlan[oldSemester].map(c => 
+                    c.id === editingCourseId 
+                      ? { ...c, name: customCourseName, credits: parseInt(customCourseCredits) || 0, customType: customCourseType }
+                      : c
+                  );
+                }
+                return newPlan;
+              });
+            } else {
+              const newCourse = {
+                id: `custom_${Date.now()}`,
+                name: customCourseName,
+                credits: parseInt(customCourseCredits) || 0,
+                isCustom: true,
+                customType: customCourseType
+              };
+              setPlannedCourses(prev => {
+                const newPlan = { ...prev };
+                newPlan[activeSemester] = [...newPlan[activeSemester], newCourse];
+                return newPlan;
+              });
+            }
+            setPlannerModalOpen(false);
+            setEditingCourseId(null);
+          };
+
+          const addCourseToPlan = (course) => {
+            setPlannedCourses(prev => {
+              const newPlan = { ...prev };
+              newPlan[activeSemester] = [...newPlan[activeSemester], course];
+              return newPlan;
+            });
+            setPlannerModalOpen(false);
+          };
+
+          const removeCourseFromPlan = (semester, courseId) => {
+            setPlannedCourses(prev => {
+              const newPlan = { ...prev };
+              newPlan[semester] = newPlan[semester].filter(c => c.id !== courseId);
+              return newPlan;
+            });
+          };
+
+          // --- 拖曳排課 ---
+          const handleDragStart = (e, semester, course) => {
+            e.dataTransfer.setData('text/plain', JSON.stringify({ semester, courseId: course.id }));
+            e.dataTransfer.effectAllowed = 'move';
+          };
+
+          const handleDragOver = (e, semester) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            if (dragOverSemester !== semester) setDragOverSemester(semester);
+          };
+
+          const handleDragLeave = () => {
+            setDragOverSemester(null);
+          };
+
+          const handleDrop = (e, targetSemester) => {
+            e.preventDefault();
+            setDragOverSemester(null);
+            try {
+              const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+              if (!data || !data.courseId || !data.semester) return;
+              if (data.semester === targetSemester) return; 
+
+              setPlannedCourses(prev => {
+                const sourceList = prev[data.semester] || [];
+                const courseIndex = sourceList.findIndex(c => c.id === data.courseId);
+                if (courseIndex === -1) return prev;
+
+                const courseToMove = sourceList[courseIndex];
+                const newSourceList = [...sourceList];
+                newSourceList.splice(courseIndex, 1);
+
+                return {
+                  ...prev,
+                  [data.semester]: newSourceList,
+                  [targetSemester]: [...(prev[targetSemester] || []), courseToMove]
+                };
+              });
+            } catch(err) {
+              console.error('Drop error', err);
+            }
+          };
+
+          const renderCatalogSection = (title, courses) => {
+            if (courses.length === 0) return null;
+            return (
+              <div className="mb-6">
+                <h4 className="text-sm font-bold text-gray-700 mb-3 border-b border-gray-200 pb-1">{title}</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {courses.map(course => (
+                    <div 
+                      key={course.id} 
+                      onClick={() => addCourseToPlan(course)}
+                      className="flex items-center w-full p-3 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 hover:shadow-md transition-all group"
+                    >
+                      <div className="flex-1 min-w-0 pr-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-bold text-sm text-gray-800 group-hover:text-blue-700 truncate" title={course.name}>
+                            {course.name}
+                          </span>
+                          {course.tag && <span className="text-[9px] bg-rose-100 text-rose-700 px-1 py-0.5 rounded font-bold whitespace-nowrap flex-shrink-0">{course.tag}</span>}
+                        </div>
+                        {course.semester && <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded mt-1 inline-block whitespace-nowrap flex-shrink-0">建議學期: {course.semester}</span>}
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-xs font-bold text-gray-400 whitespace-nowrap">{course.credits} 學分</span>
+                        <LucideIcon name="Plus" className="w-4 h-4 text-blue-300 group-hover:text-blue-600 flex-shrink-0" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          };
+
+          const renderValidationPanel = (showTitle = true) => (
+            <div className="bg-white p-5 rounded-2xl shadow-lg border border-slate-200 lg:sticky lg:top-28">
+              {showTitle && <h2 className="text-xl font-bold mb-4 text-center border-b pb-3">即時檢核表 {isLinked && <span className="text-xs font-normal text-indigo-600 block">(與規劃表連動中)</span>}</h2>}
+              <div className="space-y-4 mb-6">
+                <div className="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
+                  <h3 className="text-sm font-bold text-indigo-900 mb-2">1. 通識與畢業門檻</h3>
+                  <RuleCheck label={`語文素養 (需6) : ${stats.langCredits}/6`} isMet={stats.isLangMet} />
+                  <RuleCheck label={`跨院選修 (需8) : ${stats.parsedCross}/8`} isMet={stats.isCrossMet} hint={!stats.effectiveCrossEng ? "未包含 EAP/ESP" : ""} />
+                  <RuleCheck label={`博雅課程 (需13) : ${Math.min(stats.validLiberalTotal, 19)}/13`} isMet={stats.isLiberalMet} hint={`已選向度：${stats.activeDims}/4 (總採計 ${Math.min(stats.validLiberalTotal, 19)}/19)`} />
+                  <RuleCheck label={`服務學習 (需1) : ${stats.expCredits}/1`} isMet={stats.isExpMet} />
+                  <div className="h-px bg-indigo-200 my-2" />
+                  <RuleCheck label="國際或跨域學習" isMet={stats.isIntlCrossMet} hint="國際研修 或 跨域學程 (擇一)" />
+                  <RuleCheck label="英文能力認證已審核" isMet={stats.engCertMet} />
+                  <RuleCheck label={`大學之道 (需6場) : ${stats.uniWayCount}/6`} isMet={stats.uniWayMet} />
+                </div>
+                <div className="bg-teal-50/50 p-3 rounded-xl border border-teal-100"><h3 className="text-sm font-bold text-teal-900 mb-2">2. 運動與健康門檻</h3><RuleCheck label={`完成 體適能/游泳/其他2學分 (${stats.effectivePeOther}/2)`} isMet={stats.isPeMet} /></div>
+                <div className="bg-blue-50/50 p-3 rounded-xl border border-blue-100">
+                  <h3 className="text-sm font-bold text-blue-900 mb-2">3. 化學系專業學分</h3>
+                  <RuleCheck label={`一般必修 (需17) : ${stats.genReqCredits}/17`} isMet={stats.isGenReqMet} />
+                  <RuleCheck label={`專業必修 (需34) : ${stats.profReqCredits}/34`} isMet={stats.isProfReqMet} />
+                  <RuleCheck label={`主題課程 (需18) : ${stats.themeCreditsUsedForReq}/18`} isMet={stats.isThemeMet} />
+                </div>
+                <div className="bg-slate-100 p-4 rounded-xl border border-slate-200 flex flex-col gap-1">
+                  <div className="flex justify-between items-center"><span className="text-sm font-bold text-slate-700">畢業總學分</span><span className={`text-lg font-black ${stats.isTotalMet ? 'text-green-600' : 'text-slate-700'}`}>{stats.totalGradCredits} <span className="text-sm font-normal text-slate-500">/ 128</span></span></div>
+                </div>
+              </div>
+              <div className={`p-4 rounded-xl text-center font-bold text-lg transition-colors mb-4 ${
+                stats.isGenEdCoreMet && stats.isPeMet && stats.engCertMet && stats.uniWayMet && stats.isIntlCrossMet && stats.isGenReqMet && stats.isProfReqMet && stats.isThemeMet && stats.isTotalMet 
+                  ? 'bg-green-100 text-green-700 border border-green-200 shadow-sm'
+                  : 'bg-gray-100 text-gray-400 border border-gray-200'
+              }`}>
+                {stats.isGenEdCoreMet && stats.isPeMet && stats.engCertMet && stats.uniWayMet && stats.isIntlCrossMet && stats.isGenReqMet && stats.isProfReqMet && stats.isThemeMet && stats.isTotalMet 
+                  ? ( <><LucideIcon name="Check" className="inline-block w-6 h-6 mr-2 mb-1"/> 恭喜！符合畢業資格</> ) 
+                  : '尚未達成所有畢業條件'}
+              </div>
+              <button onClick={() => setShowUnmetModal(true)} className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm"><LucideIcon name="Search" className="w-5 h-5" /> 一鍵檢視缺漏條件</button>
+            </div>
+          );
+
+          return (
+            <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-20 relative">
+              
+              {/* 頂部 Header & 導覽列 */}
+              <div className="bg-white border-b sticky top-0 z-20 shadow-sm">
+                <div className="max-w-5xl mx-auto px-4 py-3 sm:px-6">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-blue-600 p-2 rounded-lg">
+                        <LucideIcon name="GraduationCap" className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h1 className="text-xl font-bold text-gray-900">中山化學 畢業與修課系統</h1>
+                        <p className="text-xs text-gray-500">114 學年度入學適用</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                      <div className="flex items-center gap-2 border-r border-gray-200 pr-3">
+                        <button onClick={handleExport} className="flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-lg transition-colors"><LucideIcon name="Download" className="w-3.5 h-3.5" /> 匯出</button>
+                        <button onClick={() => { setDataCode(''); setDataModalMode('import'); setDataError(''); setShowDataModal(true); }} className="flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-lg transition-colors"><LucideIcon name="Upload" className="w-3.5 h-3.5" /> 匯入</button>
+                      </div>
+
+                      <label className={`flex items-center cursor-pointer px-3 py-1.5 rounded-lg border transition-colors ${isLinked ? 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}>
+                        <div className="relative flex items-center">
+                          <input type="checkbox" className="sr-only" checked={isLinked} onChange={() => setIsLinked(!isLinked)} />
+                          <div className={`block w-9 h-5 rounded-full transition-colors ${isLinked ? 'bg-indigo-500' : 'bg-gray-300'}`}></div>
+                          <div className={`absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform ${isLinked ? 'transform translate-x-4' : ''}`}></div>
+                        </div>
+                        <span className={`ml-2 text-sm font-bold ${isLinked ? 'text-indigo-900' : 'text-gray-500'}`}>連動規劃表</span>
+                      </label>
+
+                      <div className="flex bg-slate-100 p-1 rounded-lg">
+                        <button onClick={() => setCurrentView('checker')} className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-bold transition-all ${currentView === 'checker' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}><LucideIcon name="LayoutDashboard" className="w-4 h-4" /> 檢核</button>
+                        <button onClick={() => setCurrentView('planner')} className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-bold transition-all ${currentView === 'planner' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}><LucideIcon name="CalendarDays" className="w-4 h-4" /> 規劃</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="max-w-5xl mx-auto px-4 py-6 sm:px-6">
+                
+                {/* 視圖 A：畢業條件檢核表 (Checker) */}
+                {currentView === 'checker' && (
+                  <div className="flex flex-col lg:flex-row gap-6">
+                    <div className="flex-1 space-y-6">
+                      
+                      {/* 通識教育區塊 */}
+                      <section className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                        <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-800 border-b pb-2"><LucideIcon name="Globe" className="w-5 h-5" /> 通識教育 (應修滿28學分)</h2>
+                        
+                        <div className="mb-6">
+                          <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1"><LucideIcon name="Languages" className="w-4 h-4"/> 1. 語文素養 (必修6學分)</h3>
+                          <div className="mb-4 p-4 bg-blue-50/70 rounded-xl border border-blue-100">
+                            <div className="flex items-center gap-2 mb-2">
+                              <label className="text-sm font-bold text-blue-900">入學英文分級：</label>
+                              <select value={engLevel} onChange={(e) => setEngLevel(e.target.value)} className="p-1.5 border border-blue-300 rounded-lg text-sm text-blue-800 bg-white font-medium focus:ring-2 focus:ring-blue-200 outline-none">
+                                <option value="初級">初級 (Basic)</option>
+                                <option value="中級">中級 (Intermediate)</option>
+                                <option value="中高級">中高級 (High-Intermediate)</option>
+                                <option value="高級">高級 (Advanced)</option>
+                              </select>
+                            </div>
+                            <p className="text-xs text-blue-700 font-medium">
+                              {engLevel === '初級' && '路徑：初級(0學分) ➔ 中級(3學分) ➔ 中高級 EAP/ESP'}
+                              {engLevel === '中級' && '路徑：中級(3學分) ➔ 中高級 EAP/ESP'}
+                              {engLevel === '中高級' && '路徑：中高級(3學分) ➔ 高級 EAP/ESP'}
+                              {engLevel === '高級' && '路徑：免修(得3學分) ➔ 高級 EAP/ESP'}
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <CourseItem item={{id: 'ge_chinese', name: '中文思辨與表達', credits: 3}} checked={!!checkedItems['ge_chinese']} onChange={toggleItem} isAutoChecked={isLinked && plannedIds.has('ge_chinese')} />
+                            {engLevel === '初級' && !checkedItems['eng_waiver'] && (
+                              <React.Fragment>
+                                <CourseItem item={{id: 'ge_eng_basic', name: '通識英文初級', credits: 0}} checked={!!checkedItems['ge_eng_basic']} onChange={toggleItem} isAutoChecked={isLinked && plannedIds.has('ge_eng_basic')} />
+                                <CourseItem item={{id: 'ge_eng_core', name: '通識英文中級', credits: 3}} checked={!!checkedItems['ge_eng_core']} onChange={toggleItem} isAutoChecked={isLinked && plannedIds.has('ge_eng_core')} />
+                              </React.Fragment>
+                            )}
+                            {(engLevel === '中文' || engLevel === '中級') && !checkedItems['eng_waiver'] && <CourseItem item={{id: 'ge_eng_core', name: '通識英文中級', credits: 3}} checked={!!checkedItems['ge_eng_core']} onChange={toggleItem} isAutoChecked={isLinked && plannedIds.has('ge_eng_core')} />}
+                            {engLevel === '中高級' && !checkedItems['eng_waiver'] && <CourseItem item={{id: 'ge_eng_core', name: '通識英文中高級', credits: 3}} checked={!!checkedItems['ge_eng_core']} onChange={toggleItem} isAutoChecked={isLinked && plannedIds.has('ge_eng_core')} />}
+                            
+                            {(engLevel === '高級' || checkedItems['eng_waiver']) && (
+                              <div className="flex items-center justify-between p-3 mb-2 rounded-lg border bg-green-50 border-green-200 shadow-sm col-span-1 sm:col-span-2 lg:col-span-1 gap-2">
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                  <LucideIcon name="CheckCircle2" className="w-5 h-5 text-green-600 flex-shrink-0" />
+                                  <div className="flex-1 min-w-0"><p className="font-medium text-green-900 truncate">通識英文 (已免修/抵免)</p><p className="text-xs text-green-700">取得學分</p></div>
+                                </div>
+                                <div className="font-semibold text-green-700 flex-shrink-0">3 學分</div>
+                              </div>
+                            )}
+                          </div>
+                          {engLevel !== '高級' && (
+                            <div className="mt-3 text-right">
+                              <label className="inline-flex items-center gap-2 cursor-pointer bg-slate-50 p-2 rounded border hover:bg-slate-100 transition-colors">
+                                <input type="checkbox" checked={!!checkedItems['eng_waiver']} onChange={() => toggleItem('eng_waiver')} className="rounded text-blue-600" />
+                                <span className="text-xs text-gray-700 font-medium">我已通過測驗申請「英語文抵免」(取得3學分)</span>
+                              </label>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="mb-6 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+                          <h3 className="text-sm font-bold text-gray-700 mb-3">2. 跨院選修 (必修8學分)</h3>
+                          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                            <div className="flex items-center gap-2">
+                              <label className="text-sm text-gray-600 font-medium whitespace-nowrap">已修學分數：</label>
+                              <input 
+                                type="number" min="0" 
+                                value={stats.effectiveCross === 0 ? '' : stats.effectiveCross} 
+                                onChange={(e) => setCrossCredits((parseInt(e.target.value) || 0) - (isLinked ? stats.plannerCross : 0))} 
+                                className={`w-20 py-1.5 px-2 border rounded-md text-center outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${isLinked && stats.plannerCross > 0 ? 'bg-indigo-50 border-indigo-300 text-indigo-800 font-bold' : 'bg-white border-gray-300'}`} 
+                                placeholder="0" 
+                              />
+                            </div>
+                            <div onClick={() => { if (!stats.plannerCrossEng) toggleItem('ge_cross_eng'); }} className={`flex items-center gap-2 p-2 px-3 rounded-md cursor-pointer border transition-colors ${stats.effectiveCrossEng ? (stats.plannerCrossEng ? 'bg-indigo-100 border-indigo-300 cursor-default' : 'bg-blue-100 border-blue-300') : 'bg-white border-gray-300 hover:bg-gray-50'}`}>
+                              {stats.effectiveCrossEng ? <LucideIcon name="CheckCircle2" className={`w-4 h-4 flex-shrink-0 ${stats.plannerCrossEng ? 'text-indigo-600' : 'text-blue-600'}`} /> : <LucideIcon name="Circle" className="w-4 h-4 text-gray-400 flex-shrink-0" />}
+                              <span className="text-sm font-medium text-gray-700 flex items-center gap-1 flex-wrap">
+                                已含「{stats.eapLevel} EAP/ESP」
+                                {stats.plannerCrossEng && <span className="text-[10px] bg-indigo-200 text-indigo-800 px-1.5 py-0.5 rounded-md font-bold ml-1 flex items-center gap-1 whitespace-nowrap"><LucideIcon name="CalendarDays" className="w-3 h-3"/> 已排入規劃</span>}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mb-6">
+                          <div className="flex justify-between items-start mb-3">
+                            <h3 className="text-sm font-bold text-gray-700 mt-1">3. 博雅課程 (必修13學分)</h3>
+                            <div className="flex flex-col gap-1 items-end">
+                              <span className="text-[11px] text-rose-500 font-medium bg-rose-50 px-2 py-0.5 rounded border border-rose-100">理學院：向度五、六合計至多6學分</span>
+                              <span className="text-[11px] text-indigo-500 font-medium bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">全校規定：總採計至多19學分</span>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {[ { id: 'dim1', name: '向度一：美學與文化' }, { id: 'dim2', name: '向度二：道德與生命' }, { id: 'dim3', name: '向度三：公民與全球' }, { id: 'dim4', name: '向度四：科技與社會' }, { id: 'dim5', name: '向度五：物質與生命' }, { id: 'dim6', name: '向度六：自然與生態' }].map(dim => (
+                              <div key={dim.id} className="flex items-center justify-between p-2 border rounded-lg bg-gray-50">
+                                <span className="text-xs text-gray-600 font-medium">{dim.name}</span>
+                                <input 
+                                  type="number" min="0" 
+                                  value={stats.effDims[dim.id] === 0 ? '' : stats.effDims[dim.id]} 
+                                  onChange={(e) => handleLiberalChange(dim.id, (parseInt(e.target.value) || 0) - (isLinked ? stats.plannerDims[dim.id] : 0))} 
+                                  className={`w-14 py-1 border rounded-md text-center text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${isLinked && stats.plannerDims[dim.id] > 0 ? 'bg-indigo-50 border-indigo-300 text-indigo-800 font-bold' : 'bg-white border-gray-300'}`} 
+                                  placeholder="0" 
+                                />
+                              </div>
+                            ))}
+                          </div>
+                          {stats.invalidDim56 > 0 && <p className="text-xs text-rose-500 mt-2 flex items-center gap-1"><LucideIcon name="AlertCircle" className="w-3 h-3 flex-shrink-0"/> 警告：向度五與六合計超過6學分，溢出的 {stats.invalidDim56} 學分不計入畢業總計。</p>}
+                          {stats.invalidLiberalExcess > 0 && <p className="text-xs text-rose-500 mt-2 flex items-center gap-1"><LucideIcon name="AlertCircle" className="w-3 h-3 flex-shrink-0"/> 警告：博雅總計超過19學分採計上限！溢出的 {stats.invalidLiberalExcess} 學分將不計入畢業總計。</p>}
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-bold text-gray-700 mb-3">4. 體驗性、零學分與跨域門檻</h3>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-3">
+                            <CourseItem item={{id: 'ge_service', name: '服務學習', credits: 1}} checked={!!checkedItems['ge_service']} onChange={toggleItem} isAutoChecked={isLinked && plannedIds.has('ge_service')} />
+                            <CourseItem item={{id: 'zc_eng_cert', name: '英文門檻審核通過', credits: 0}} checked={!!checkedItems['zc_eng_cert']} onChange={toggleItem} isAutoChecked={isLinked && plannedIds.has('zc_eng_cert')} />
+                          </div>
+
+                          {/* 大學之道 6場 */}
+                          <div className="mb-3 bg-gray-50 rounded-xl border border-gray-200 p-4 shadow-sm">
+                            <div className="flex justify-between items-center mb-3">
+                              <h4 className="text-sm font-bold text-gray-800 flex items-center gap-1.5">
+                                大學之道 (需參加 6 場)
+                                {stats.isUniWayPlanned && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md font-bold flex items-center gap-1 ml-1 whitespace-nowrap"><LucideIcon name="CalendarDays" className="w-3 h-3"/> 已排入規劃</span>}
+                              </h4>
+                              <span className={`text-xs font-bold px-2 py-1 rounded whitespace-nowrap ${stats.uniWayMet ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+                                進度: {stats.uniWayCount} / 6
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                              {[1, 2, 3, 4, 5, 6].map(i => (
+                                 <div 
+                                   key={`zc_uni_way_${i}`} 
+                                   onClick={() => { if (!stats.isUniWayPlanned) toggleItem(`zc_uni_way_${i}`) }}
+                                   className={`flex items-center gap-2 p-2 border rounded-lg transition-colors ${checkedItems[`zc_uni_way_${i}`] || stats.isUniWayPlanned ? (stats.isUniWayPlanned ? 'bg-indigo-50 border-indigo-200 cursor-default' : 'bg-blue-50 border-blue-200 cursor-pointer') : 'bg-white cursor-pointer hover:bg-gray-100'}`}
+                                 >
+                                   {(checkedItems[`zc_uni_way_${i}`] || stats.isUniWayPlanned) ? <LucideIcon name="CheckCircle2" className={`w-4 h-4 flex-shrink-0 ${stats.isUniWayPlanned ? 'text-indigo-600' : 'text-blue-600'}`} /> : <LucideIcon name="Circle" className="w-4 h-4 text-gray-300 flex-shrink-0" />}
+                                   <span className={`text-xs font-medium whitespace-nowrap ${(checkedItems[`zc_uni_way_${i}`] || stats.isUniWayPlanned) ? (stats.isUniWayPlanned ? 'text-indigo-900' : 'text-blue-900') : 'text-gray-700'}`}>第 {i} 場</span>
+                                 </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* 國際或跨域學習面板 */}
+                          <div className="mt-3 bg-purple-50/60 rounded-xl border border-purple-100 p-4 shadow-sm">
+                            <div className="flex justify-between items-center mb-2">
+                              <h4 className="text-sm font-bold text-purple-900 flex items-center gap-1.5">
+                                <LucideIcon name="Award" className="w-4 h-4 text-purple-600" /> 國際或跨域學習門檻 (二擇一)
+                              </h4>
+                            </div>
+                            <p className="text-xs text-purple-700 mb-3 font-medium">109學年度起入學之學士班學生，畢業應符合下列至少一項條件：</p>
+                            <div className="space-y-2">
+                              <div 
+                                onClick={() => toggleItem('zc_intl')}
+                                className={`flex gap-3 p-3 rounded-xl border transition-colors cursor-pointer ${checkedItems['zc_intl'] ? (isLinked && plannedIds.has('zc_intl') ? 'bg-indigo-50 border-indigo-200 shadow-sm hover:bg-indigo-100' : 'bg-purple-100 border-purple-300 shadow-sm hover:bg-purple-200') : 'bg-white border-purple-100 hover:bg-purple-50'}`}
+                              >
+                                {checkedItems['zc_intl'] ? <LucideIcon name="CheckCircle2" className={`w-5 h-5 flex-shrink-0 ${isLinked && plannedIds.has('zc_intl') ? 'text-indigo-600' : 'text-purple-600'}`} /> : <LucideIcon name="Circle" className="w-5 h-5 text-gray-300 flex-shrink-0" />}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-1 flex-wrap">
+                                    <span className="text-sm font-bold text-gray-800">國際學習</span>
+                                    {isLinked && plannedIds.has('zc_intl') && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md font-bold flex items-center gap-1 whitespace-nowrap"><LucideIcon name="CalendarDays" className="w-3 h-3"/> 已排入規劃</span>}
+                                  </div>
+                                  <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">出國交換或研修至少一學期，或完成所屬學系審查同意之國外研修課程至少2學分或國外研修計畫（學習時數至少36小時）。</p>
+                                </div>
+                              </div>
+                              <div 
+                                onClick={() => toggleItem('zc_cross')}
+                                className={`flex gap-3 p-3 rounded-xl border transition-colors cursor-pointer ${checkedItems['zc_cross'] ? (isLinked && plannedIds.has('zc_cross') ? 'bg-indigo-50 border-indigo-200 shadow-sm hover:bg-indigo-100' : 'bg-purple-100 border-purple-300 shadow-sm hover:bg-purple-200') : 'bg-white border-purple-100 hover:bg-purple-50'}`}
+                              >
+                                {checkedItems['zc_cross'] ? <LucideIcon name="CheckCircle2" className={`w-5 h-5 flex-shrink-0 ${isLinked && plannedIds.has('zc_cross') ? 'text-indigo-600' : 'text-purple-600'}`} /> : <LucideIcon name="Circle" className="w-5 h-5 text-gray-300 flex-shrink-0" />}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-1 flex-wrap">
+                                    <span className="text-sm font-bold text-gray-800">跨域學習</span>
+                                    {isLinked && plannedIds.has('zc_cross') && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md font-bold flex items-center gap-1 whitespace-nowrap"><LucideIcon name="CalendarDays" className="w-3 h-3"/> 已排入規劃</span>}
+                                  </div>
+                                  <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">取得本校或他校一個輔系、雙主修或教育學程或本校開設之微學程、整合學程(含個人化學程)或跨系所專業學程。</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+
+                      {/* 體育 */}
+                      <section className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                        <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-teal-700 border-b pb-2"><LucideIcon name="Activity" className="w-5 h-5" /> 運動與健康 (必修4學分，不計入畢業)</h2>
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                          <div className="flex flex-wrap gap-4 items-center">
+                            <div onClick={() => toggleItem('pe_fit')} className={`flex items-center gap-2 p-2 px-3 border rounded-lg transition-colors cursor-pointer ${checkedItems['pe_fit'] ? (isLinked && plannedIds.has('pe_fit') ? 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100' : 'bg-teal-50 border-teal-300 hover:bg-teal-100') : 'bg-white hover:bg-gray-50'}`}>
+                              {checkedItems['pe_fit'] ? <LucideIcon name="CheckCircle2" className={`w-4 h-4 flex-shrink-0 ${isLinked && plannedIds.has('pe_fit') ? 'text-indigo-600' : 'text-teal-600'}`}/> : <LucideIcon name="Circle" className="w-4 h-4 text-gray-300 flex-shrink-0"/>}
+                              <span className="text-sm font-medium text-gray-700 whitespace-nowrap">體適能 {isLinked && plannedIds.has('pe_fit') && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1 py-0.5 rounded-md ml-1 font-bold">已排入</span>}</span>
+                            </div>
+                            <div onClick={() => toggleItem('pe_swim')} className={`flex items-center gap-2 p-2 px-3 border rounded-lg transition-colors cursor-pointer ${checkedItems['pe_swim'] ? (isLinked && plannedIds.has('pe_swim') ? 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100' : 'bg-teal-50 border-teal-300 hover:bg-teal-100') : 'bg-white hover:bg-gray-50'}`}>
+                              {checkedItems['pe_swim'] ? <LucideIcon name="CheckCircle2" className={`w-4 h-4 flex-shrink-0 ${isLinked && plannedIds.has('pe_swim') ? 'text-indigo-600' : 'text-teal-600'}`}/> : <LucideIcon name="Circle" className="w-4 h-4 text-gray-300 flex-shrink-0"/>}
+                              <span className="text-sm font-medium text-gray-700 whitespace-nowrap">初級游泳 {isLinked && plannedIds.has('pe_swim') && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1 py-0.5 rounded-md ml-1 font-bold">已排入</span>}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                            <label className="text-sm text-gray-600 font-medium whitespace-nowrap">其他體育學分：</label>
+                            <input 
+                              type="number" min="0" 
+                              value={stats.effectivePeOther === 0 ? '' : stats.effectivePeOther} 
+                              onChange={(e) => setManualCheckedItems(p => ({...p, pe_other: (parseInt(e.target.value) || 0) - (isLinked ? stats.plannerPe : 0)}))} 
+                              className={`w-16 py-1.5 px-2 border rounded-md text-center outline-none focus:ring-2 focus:ring-teal-500 transition-colors ${isLinked && stats.plannerPe > 0 ? 'bg-indigo-50 border-indigo-300 text-indigo-800 font-bold' : 'bg-white border-gray-300'}`} 
+                              placeholder="0" 
+                            />
+                          </div>
+                        </div>
+                      </section>
+
+                      {/* 系必選修 */}
+                      <section className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                        <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-blue-800 border-b pb-2"><LucideIcon name="Calculator" className="w-5 h-5" /> 系必修與選修</h2>
+                        <div className="flex justify-between items-end mb-2 mt-4"><h3 className="text-sm font-bold text-gray-700">一般必修 (應修滿 17 學分)</h3><span className={`text-sm font-bold ${stats.isGenReqMet ? 'text-green-600' : 'text-blue-600'}`}>已選 {stats.genReqCredits} 學分</span></div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
+                          {CURRICULUM.generalRequired.map(item => (
+                            <CourseItem key={item.id} item={item} checked={!!checkedItems[item.id]} onChange={toggleItem} isAutoChecked={isLinked && plannedIds.has(item.id)} />
+                          ))}
+                        </div>
+                        
+                        <div className="flex justify-between items-end mb-2"><h3 className="text-sm font-bold text-gray-700">專業必修 (應修滿 34 學分)</h3><span className={`text-sm font-bold ${stats.isProfReqMet ? 'text-green-600' : 'text-blue-600'}`}>已選 {stats.profReqCredits} 學分</span></div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-6">
+                          {CURRICULUM.professionalRequired.map(item => (
+                            <CourseItem key={item.id} item={item} checked={!!checkedItems[item.id]} onChange={toggleItem} isAutoChecked={isLinked && plannedIds.has(item.id)} />
+                          ))}
+                        </div>
+                        
+                        <div className="flex justify-between items-end mb-2"><h3 className="text-sm font-bold text-gray-700">主題課程 (至少18學分)</h3><span className={`text-sm font-bold ${stats.isThemeMet ? 'text-green-600' : 'text-blue-600'}`}>已選 {stats.themeCredits} 學分</span></div>
+                        <div className="flex items-center gap-2 mb-3 bg-blue-50 p-2 rounded-lg border border-blue-100">
+                          <LucideIcon name="Info" className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                          <p className="text-xs text-blue-800">帶有 <span className="font-bold text-rose-600 bg-rose-100 px-1 rounded">推薦主題選修</span> 標籤者為系上強烈建議選修。超過18學分的部分自動計入自由學分。</p>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 h-64 overflow-y-auto pr-2 custom-scrollbar mb-6 border-b pb-4">
+                          {CURRICULUM.themeCourses.map(item => (
+                            <CourseItem key={item.id} item={item} checked={!!checkedItems[item.id]} onChange={toggleItem} isAutoChecked={isLinked && plannedIds.has(item.id)} />
+                          ))}
+                        </div>
+                        
+                        <h3 className="text-sm font-bold text-gray-700 mb-2">自由學分</h3>
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-3">
+                            <input 
+                              type="number" min="0" 
+                              value={stats.effectiveFreeElectives === 0 ? '' : stats.effectiveFreeElectives} 
+                              onChange={(e) => setFreeElectives((parseInt(e.target.value) || 0) - (isLinked ? stats.plannerFree : 0))} 
+                              className={`w-24 py-1.5 px-2 border rounded-lg text-center font-semibold outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${isLinked && stats.plannerFree > 0 ? 'bg-indigo-50 border-indigo-300 text-indigo-800' : 'bg-white border-gray-300'}`} 
+                              placeholder="0" 
+                            />
+                            <span className="text-sm text-gray-600 font-medium whitespace-nowrap">手動輸入與自動帶入合計</span>
+                          </div>
+                          <div className="text-sm text-gray-500 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            <p className="mb-1 text-gray-600 font-medium">自由學分組成明細：</p>
+                            <ul className="list-disc list-inside text-xs text-gray-500 space-y-0.5 mb-2">
+                              <li>自訂選修：{stats.effectiveFreeElectives} 學分</li>
+                              {stats.themeCreditsSpillover > 0 && <li>主題課程溢出：{stats.themeCreditsSpillover} 學分</li>}
+                              {stats.crossSpillover > 0 && <li>跨院選修溢出：{stats.crossSpillover} 學分</li>}
+                              {stats.validLiberalSpillover > 0 && <li>博雅課程溢出：{stats.validLiberalSpillover} 學分 {stats.invalidLiberalExcess > 0 ? '(已達採計上限)' : ''}</li>}
+                            </ul>
+                            <div className="border-t border-gray-200 pt-2 mt-1">合計：<span className="font-bold text-gray-800 text-base">{stats.totalFreeElectives}</span> 學分</div>
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+
+                    <div className="w-full lg:w-80 flex-shrink-0">
+                      {renderValidationPanel(false)}
+                    </div>
+                  </div>
+                )}
+
+                {/* 視圖 B：學期修課規劃 (Planner) */}
+                {currentView === 'planner' && (
+                  <div className="flex flex-col lg:flex-row gap-6">
+                    <div className="flex-1">
+                      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                        <div>
+                          <h2 className="text-2xl font-black text-blue-900 flex items-center gap-2"><LucideIcon name="CalendarDays" className="w-6 h-6"/> 四年修課藍圖規劃</h2>
+                          <p className="text-sm text-blue-700 mt-1">您可以點擊「加入課程」或 <strong>直接拖曳</strong> 移動課程。手機版亦可按 ✏️ 編輯更換學期。</p>
+                        </div>
+                        <div className="bg-white px-5 py-3 rounded-xl shadow-sm border border-blue-200 text-center flex-shrink-0">
+                          <span className="block text-xs font-bold text-gray-500 uppercase">已規劃總學分</span>
+                          <span className="text-2xl font-black text-blue-600">{totalPlannedCredits}</span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                        {SEMESTERS.map(semester => {
+                          const courses = plannedCourses[semester] || [];
+                          const semesterCredits = courses.reduce((sum, c) => sum + c.credits, 0);
+                          
+                          return (
+                            <div key={semester} className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full">
+                              <div className="bg-slate-50 border-b border-gray-100 p-3 flex justify-between items-center">
+                                <h3 className="font-bold text-base text-gray-800">{semester}</h3>
+                                <span className={`text-xs font-bold px-2 py-1 rounded-full ${semesterCredits >= 9 && semesterCredits <= 25 ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>{semesterCredits} 學分</span>
+                              </div>
+                              
+                              <div 
+                                className={`p-3 flex-1 min-h-[120px] transition-colors ${dragOverSemester === semester ? 'bg-blue-50 border-2 border-dashed border-blue-400' : 'bg-white'}`}
+                                onDragOver={(e) => handleDragOver(e, semester)}
+                                onDragLeave={handleDragLeave}
+                                onDrop={(e) => handleDrop(e, semester)}
+                              >
+                                {courses.length === 0 ? (
+                                  <div className="h-full min-h-[80px] flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-100 rounded-xl pointer-events-none"><p className="text-xs">拖曳課程至此</p></div>
+                                ) : (
+                                  <ul className="space-y-2">
+                                    {courses.map(course => (
+                                      <li key={course.id} draggable onDragStart={(e) => handleDragStart(e, semester, course)} className="group p-2.5 bg-gray-50 hover:bg-blue-50 border border-gray-100 hover:border-blue-300 rounded-xl transition-colors cursor-move shadow-sm flex flex-col gap-1.5">
+                                        <div className="flex items-center justify-between gap-2 w-full">
+                                          <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                            <LucideIcon name="GripVertical" className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                            <span className="font-medium text-xs text-gray-800 truncate" title={course.name}>{course.name}</span>
+                                          </div>
+                                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                                            <span className="text-[10px] font-bold text-gray-500">{course.credits}學分</span>
+                                            <button onClick={() => openEditModal(semester, course)} className="text-gray-300 hover:text-blue-600"><LucideIcon name="Pencil" className="w-3.5 h-3.5" /></button>
+                                            <button onClick={() => removeCourseFromPlan(semester, course.id)} className="text-gray-300 hover:text-rose-500"><LucideIcon name="Trash2" className="w-3.5 h-3.5" /></button>
+                                          </div>
+                                        </div>
+                                        <div className="flex flex-wrap gap-1 ml-5">
+                                          {course.type === '必修' && <span className="text-[9px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded">必修</span>}
+                                          {course.type === '通識必修' && <span className="text-[9px] bg-sky-100 text-sky-700 px-1 py-0.5 rounded">通識</span>}
+                                          {course.type === '門檻' && <span className="text-[9px] bg-purple-100 text-purple-700 px-1 py-0.5 rounded">門檻</span>}
+                                          {course.type === '體育' && <span className="text-[9px] bg-teal-100 text-teal-700 px-1 py-0.5 rounded">體育</span>}
+                                          {course.tag && <span className="text-[9px] bg-rose-100 text-rose-700 px-1 py-0.5 rounded font-bold">{course.tag}</span>}
+                                          {course.isCustom && (
+                                            <span className="text-[9px] bg-indigo-100 text-indigo-700 px-1 py-0.5 rounded">
+                                              自訂: {
+                                                course.customType === 'cross' ? '跨院' :
+                                                course.customType === 'cross_eng' ? '跨院(EAP)' :
+                                                course.customType === 'pe' ? '體育' :
+                                                course.customType && course.customType.startsWith('dim') ? `向度${{'1':'一','2':'二','3':'三','4':'四','5':'五','6':'六'}[course.customType.slice(3)]}` : '自由'
+                                              }
+                                            </span>
+                                          )}
+                                        </div>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+
+                              <div className="p-2 border-t border-gray-50 bg-gray-50/50">
+                                <button onClick={() => handleOpenPlannerModal(semester)} className="w-full py-2 flex items-center justify-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-100"><LucideIcon name="Plus" className="w-3.5 h-3.5" /> 加入課程</button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="w-full lg:w-80 flex-shrink-0 hidden lg:block">
+                      {renderValidationPanel(true)}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 規劃表彈出視窗 */}
+              {plannerModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                  <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                    <div className="flex justify-between items-center p-4 border-b">
+                      <h3 className="text-lg font-bold text-gray-900">{editingCourseId ? '編輯或移動課程' : '加入課程至'} <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md ml-1">{activeSemester}</span></h3>
+                      <button onClick={() => setPlannerModalOpen(false)} className="text-gray-400 hover:bg-gray-100 p-1 rounded-md"><LucideIcon name="X" className="w-6 h-6"/></button>
+                    </div>
+
+                    {!editingCourseId && (
+                      <div className="flex border-b">
+                        <button onClick={() => setPlannerTab('catalog')} className={`flex-1 py-3 text-sm font-bold border-b-2 ${plannerTab === 'catalog' ? 'border-blue-600 text-blue-700' : 'border-transparent text-gray-500'}`}>從清單中選擇</button>
+                        <button onClick={() => setPlannerTab('custom')} className={`flex-1 py-3 text-sm font-bold border-b-2 ${plannerTab === 'custom' ? 'border-blue-600 text-blue-700' : 'border-transparent text-gray-500'}`}>自訂 / 通識 / 自由學分</button>
+                      </div>
+                    )}
+                    
+                    <div className="p-5 overflow-y-auto bg-slate-50 flex-1">
+                      {plannerTab === 'catalog' && !editingCourseId && (
+                        <div>
+                          {renderCatalogSection('系定必修', availableCatalog.filter(c => c.type === '必修'))}
+                          {renderCatalogSection('通識必修', availableCatalog.filter(c => c.type === '通識必修'))}
+                          {renderCatalogSection('畢業門檻與體驗', availableCatalog.filter(c => c.type === '門檻'))}
+                          {renderCatalogSection('化學主題選修', availableCatalog.filter(c => c.type === '主題'))}
+                          {availableCatalog.length === 0 && <div className="text-center py-10 text-gray-400">已無可用清單課程。</div>}
+                        </div>
+                      )}
+
+                      {(plannerTab === 'custom' || editingCourseId) && (
+                        <div className="max-w-sm mx-auto py-4 space-y-4">
+                          <div className="bg-white p-5 border border-gray-200 rounded-2xl shadow-sm space-y-4">
+                            {editingCourseId && (
+                              <div>
+                                <label className="block text-sm font-bold text-blue-900 mb-1">變更學期</label>
+                                <select value={activeSemester} onChange={(e) => setActiveSemester(e.target.value)} className="w-full p-2 border border-blue-300 rounded-lg text-sm bg-white font-bold text-blue-800">
+                                  {SEMESTERS.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                              </div>
+                            )}
+                            
+                            {(!editingCourseId || String(editingCourseId).startsWith('custom_')) && (
+                              <React.Fragment>
+                                <div>
+                                  <label className="block text-sm font-bold text-gray-700 mb-1">課程類別</label>
+                                  <select value={customCourseType} onChange={(e) => setCustomCourseType(e.target.value)} className="w-full p-2.5 border rounded-lg text-sm bg-white">
+                                    <option value="free">自由學分 / 一般外系選修</option>
+                                    <option value="cross">跨院選修 (一般)</option>
+                                    <option value="cross_eng">跨院選修 (含 EAP/ESP 英文)</option>
+                                    <option value="dim1">博雅向度一：美學與文化</option>
+                                    <option value="dim2">博雅向度二：道德與生命</option>
+                                    <option value="dim3">博雅向度三：公民與全球</option>
+                                    <option value="dim4">博雅向度四：科技與社會</option>
+                                    <option value="dim5">博雅向度五：物質與生命</option>
+                                    <option value="dim6">博雅向度六：自然與生態</option>
+                                    <option value="pe">體育 (其他體育)</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-bold text-gray-700 mb-1">課程名稱</label>
+                                  <input type="text" placeholder="請輸入課程名稱..." value={customCourseName} onChange={(e) => setCustomCourseName(e.target.value)} className="w-full p-2.5 border rounded-lg bg-white" />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-bold text-gray-700 mb-1">學分數</label>
+                                  <input type="number" min="0" max="10" value={customCourseCredits} onChange={(e) => setCustomCourseCredits(e.target.value)} className="w-full p-2.5 border rounded-lg bg-white" />
+                                </div>
+                              </React.Fragment>
+                            )}
+                            <button onClick={saveCustomCourse} disabled={(!editingCourseId || String(editingCourseId).startsWith('custom_')) && !customCourseName.trim()} className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold rounded-xl">{editingCourseId ? '儲存變更' : '加入課表'}</button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 缺漏條件彈出視窗 */}
+              {showUnmetModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                  <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+                    <div className="flex justify-between items-center p-4 border-b bg-blue-50"><h3 className="text-lg font-bold text-blue-900 flex items-center gap-2"><LucideIcon name="AlertCircle" className="w-5 h-5 text-blue-600"/> 未達標條件清單</h3><button onClick={() => setShowUnmetModal(false)} className="text-gray-500 hover:bg-gray-200 p-1 rounded-md"><LucideIcon name="X" className="w-6 h-6"/></button></div>
+                    <div className="p-5 overflow-y-auto">
+                      {getUnmetList().length > 0 ? (
+                        <ul className="space-y-3">
+                          {getUnmetList().map((item, idx) => <li key={idx} className="flex gap-3 items-start bg-rose-50 p-3 rounded-lg border border-rose-100"><LucideIcon name="AlertCircle" className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" /><span className="text-sm font-medium text-rose-800 leading-relaxed">{item}</span></li>)}
+                        </ul>
+                      ) : (
+                        <div className="text-center py-10"><LucideIcon name="CheckCircle2" className="w-20 h-20 text-green-500 mx-auto mb-4" /><p className="text-2xl font-bold text-gray-800">恭喜達標！🎓</p></div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 匯入匯出彈出視窗 */}
+              {showDataModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                  <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
+                    <div className="flex justify-between items-center p-4 border-b bg-slate-50"><h3 className="font-bold text-gray-800">{dataModalMode === 'export' ? '匯出資料代碼' : '匯入資料代碼'}</h3><button onClick={() => setShowDataModal(false)} className="text-gray-400 p-1"><LucideIcon name="X" className="w-5 h-5"/></button></div>
+                    <div className="p-5">
+                      <textarea id="export-textarea" className="w-full h-32 p-3 border rounded-lg text-sm font-mono text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none resize-none bg-white" value={dataCode} onChange={(e) => setDataCode(e.target.value)} readOnly={dataModalMode === 'export'} placeholder="請在此貼上代碼..." onClick={(e) => { if (dataModalMode === 'export') { e.target.focus(); e.target.select(); e.target.setSelectionRange(0, 999999); } }}></textarea>
+                      {dataError && <p className="text-xs text-rose-500 mt-2">{dataError}</p>}
+                      {copySuccess && <p className="text-xs text-green-600 mt-2">已成功複製到剪貼簿！</p>}
+                    </div>
+                    <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
+                      {dataModalMode === 'export' ? (
+                        <button onClick={copyToClipboard} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors">複製代碼</button>
+                      ) : (
+                        <button onClick={handleImport} disabled={!dataCode.trim()} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors">確認匯入</button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <style dangerouslySetInnerHTML={{__html: `
+                .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+              `}} />
+            </div>
+          );
+        }
+
+        // 將元件渲染到 DOM 中
+        const root = RoyalElement = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
